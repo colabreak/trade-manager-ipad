@@ -28,7 +28,7 @@
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 0 12px}
   .input{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 10px;font-size:var(--fs);background:#fff;min-width:200px}
   .btn{height:var(--ctl-h);padding:0 8px;border-radius:var(--radius);border:1px solid transparent;font-size:var(--fs-small);cursor:pointer;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:54px;} /* normalized */
-  .btn.primary{background:var(--blue-weak);color:var(--blue);border-color:var(--blue-border);box-shadow:inset 0 -1px 0 rgba(0,0,0,.02);}
+  .btn.primary{background:var(--blue-weak);color:var(--blue);border-color:var(--blue-border);box-shadow:inset 0 -1px 0 rgba(0,0,0,.02);} .btn.icon{min-width:36px;padding:0 6px;} 
   .btn.secondary{background:#fff;border-color:var(--line);color:var(--ink)}
   .btn.danger{background:var(--red-weak);color:var(--red);border-color:var(--red-border);box-shadow:inset 0 -1px 0 rgba(0,0,0,.02);}
 
@@ -46,7 +46,7 @@
   input[type="date"]{width:14ch;text-align:center}
   .name{width:100%}
   .link{width:3ch;min-width:3ch;text-align:center;font-size:var(--fs);padding:0 4px;}
-  .stack{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;align-items:center;justify-content:center;column-gap:8px;min-width:220px;} /* perfect centering, no wrap */
+  .stack{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;align-items:center;justify-content:center;column-gap:8px;min-width:180px;} /* button -> date order */ /* perfect centering, no wrap */
   .cooldown{color:#b91c1c;font-weight:700}
   .clear{color:var(--ink)}
 
@@ -110,10 +110,7 @@ function render(){
     // 日付 + 更新（横並び、ノーラップ）
     const tdDate=document.createElement('td');
     const stk=document.createElement('div');stk.className='stack';
-    const inputDate=document.createElement('input');inputDate.type='date';inputDate.value=r.date||'';inputDate.className=daysSince(r.date)<15?'cooldown':'clear';
-    inputDate.oninput=e=>{r.date=e.target.value;inputDate.className=daysSince(r.date)<15?'cooldown':'clear'};
-    const upd=document.createElement('button');upd.className='btn primary';upd.textContent='更新';upd.onclick=()=>{r.date=todayStr();inputDate.value=r.date;inputDate.className='cooldown'};
-    stk.append(inputDate,upd);tdDate.appendChild(stk);
+    const inputDate=document.createElement('input');inputDate.type='date';inputDate.value=r.date||'';inputDate.className=daysSince(r.date)<15?'cooldown':'clear';inputDate.oninput=e=>{r.date=e.target.value;inputDate.className=daysSince(r.date)<15?'cooldown':'clear'};const upd=document.createElement('button');upd.className='btn primary icon';upd.textContent='⟳';upd.title='今日に更新';upd.onclick=()=>{r.date=todayStr();inputDate.value=r.date;inputDate.className='cooldown'};stk.append(upd,inputDate);tdDate.appendChild(stk);
 
     // 名前
     const tdName=document.createElement('td');
