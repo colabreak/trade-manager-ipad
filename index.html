@@ -9,7 +9,7 @@
     --bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;
     --blue:#2563eb;--blue-weak:#e9f0ff;--blue-border:#c7d7ff;
     --red:#ef4444;--red-weak:#ffeaea;--red-border:#ffc9c9;
-    --ctl-h:30px;--radius:8px;
+    --ctl-h:28px;--radius:8px;
     --fs:clamp(12px,1.5vw,13px);--fs-small:clamp(11px,1.3vw,12px);
   }
   html,body{height:100%}
@@ -21,24 +21,24 @@
   h1{margin:0 0 8px;text-align:center;font-size:clamp(14px,2vw,16px);font-weight:700}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 0 12px}
   .input{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 10px;font-size:var(--fs);background:#fff;min-width:200px}
-  .btn{height:var(--ctl-h);padding:0 8px;border-radius:var(--radius);border:1px solid transparent;font-size:var(--fs-small);cursor:pointer;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:54px;}
-  .btn.primary{background:var(--blue-weak);color:var(--blue);border-color:var(--blue-border);}
+  .btn{height:var(--ctl-h);padding:0 6px;border-radius:var(--radius);border:1px solid transparent;font-size:var(--fs-small);cursor:pointer;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:46px;}
+  .btn.primary{background:var(--blue-weak);color:var(--blue);border-color:var(--blue-border);} .btn.icon{min-width:28px;padding:0 6px;} 
   .btn.secondary{background:#fff;border-color:var(--line);color:var(--ink)}
-  .btn.danger{background:var(--red-weak);color:var(--red);border-color:var(--red-border)}
+  .btn.danger{background:var(--red-weak);color:var(--red);border-color:var(--red-border);min-width:52px;}
 
   .tableWrap{padding:8px 12px 12px}
   table{width:100%;border-collapse:collapse;table-layout:fixed}
   th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:middle;text-align:center;}
   th{background:#f9fafb;color:#374151;font-weight:600;white-space:nowrap}
 
-  .col-date{width:20ch;text-align:center;}
-  .col-link{width:6ch;text-align:center}
+  .col-date{width:22ch;text-align:center;} /* widen date to avoid clipping */
+  .col-link{width:8ch;text-align:center} /* one column for two stacked inputs */
   .col-del{width:8ch;text-align:center}
 
   input[type="date"], input[type="text"]{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 8px;font-size:var(--fs);background:#fff;box-sizing:border-box;}
   input[type="date"]{width:12ch;text-align:center}
-  .name{width:100%}
-  .link{width:3ch;min-width:3ch;text-align:center;font-size:var(--fs);padding:0 4px;}
+  .name{width:100%} /* name will naturally take extra space */
+  .link{width:3ch;min-width:3ch;text-align:center;font-size:var(--fs);padding:0 4px;} .linkStack{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;}
 
   .stack{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto;white-space:nowrap;}
   .cooldown{color:#b91c1c;font-weight:700}
@@ -67,8 +67,7 @@
             <tr>
               <th class="col-date">最終日付 / 更新</th>
               <th>名前</th>
-              <th class="col-link">リンク1</th>
-              <th class="col-link">リンク2</th>
+              <th class="col-link">リンク</th>
               <th class="col-del">削除</th>
             </tr>
           </thead>
@@ -109,19 +108,21 @@ function render(){
     const tdName=document.createElement('td');
     const nm=document.createElement('input');nm.type='text';nm.className='name';nm.value=r.name||'';nm.oninput=e=>r.name=e.target.value;tdName.appendChild(nm);
 
-    // link1
-    const tdL1=document.createElement('td');
-    const l1=document.createElement('input');l1.className='link';l1.inputMode='numeric';l1.maxLength=2;l1.value=r.link1||'';l1.oninput=e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,2);r.link1=e.target.value};tdL1.appendChild(l1);
+    // links stacked in one cell
+    const tdLinks=document.createElement('td');
+    tdLinks.className='col-link';
+    const ls=document.createElement('div'); ls.className='linkStack';
+    const l1=document.createElement('input'); l1.className='link'; l1.inputMode='numeric'; l1.maxLength=2; l1.value=r.link1||''; l1.oninput=e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,2); r.link1=e.target.value};
+    const l2=document.createElement('input'); l2.className='link'; l2.inputMode='numeric'; l2.maxLength=2; l2.value=r.link2||''; l2.oninput=e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,2); r.link2=e.target.value};
+    ls.append(l1,l2); tdLinks.appendChild(ls);
 
-    // link2
-    const tdL2=document.createElement('td');
-    const l2=document.createElement('input');l2.className='link';l2.inputMode='numeric';l2.maxLength=2;l2.value=r.link2||'';l2.oninput=e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,2);r.link2=e.target.value};tdL2.appendChild(l2);
+    // removed separate link2 column (now stacked)
 
     // delete（薄い赤）
     const tdDel=document.createElement('td');
     const del=document.createElement('button');del.className='btn danger';del.textContent='削除';del.onclick=()=>confirmDel(i);tdDel.appendChild(del);
 
-    tr.append(tdDate,tdName,tdL1,tdL2,tdDel);tb.appendChild(tr);
+    tr.append(tdDate,tdName,tdLinks,tdDel);tb.appendChild(tr);
   })
 }
 
