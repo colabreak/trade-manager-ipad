@@ -28,19 +28,19 @@
 
   .tableWrap{padding:8px 12px 12px}
   table{width:100%;border-collapse:collapse;table-layout:fixed}
-  th,td{border:1px solid var(--line);padding:4px 6px;vertical-align:middle;text-align:left;} /* tighter padding, left align by default */
+  th,td{border:1px solid var(--line);padding:4px 6px;vertical-align:middle;text-align:left;} th.col-del{text-align:center;} /* center only the header of delete column */ /* tighter padding, left align by default */
   th{background:#f9fafb;color:#374151;font-weight:600;white-space:nowrap}
 
-  .col-date{width:24ch;text-align:center;} /* give date more room */ /* widen date to avoid clipping */
-  .col-link{width:5ch;text-align:left} /* narrower link column and left align */ /* one column for two stacked inputs */
+  .col-date{width:26ch;text-align:center;} /* widen date column more */ /* give date more room */ /* widen date to avoid clipping */
+  .col-link{width:5ch;text-align:left} /* keep narrow link column */ /* narrower link column and left align */ /* one column for two stacked inputs */
   .col-del{width:7ch;text-align:left} /* left align delete */
 
   input[type="date"], input[type="text"]{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 8px;font-size:var(--fs);background:#fff;box-sizing:border-box;}
-  input[type="date"]{width:15ch;text-align:center} /* extra room for OS icon */
+  input[type="date"]{width:16ch;text-align:center} /* widen date input to avoid clipping */ /* extra room for OS icon */
   .name{width:100%} /* name will naturally take extra space */
   .link{width:3ch;min-width:3ch;text-align:center;font-size:var(--fs);padding:0 4px;} .linkStack{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;}
 
-  .stack{display:inline-flex;align-items:center;justify-content:center;gap:4px;width:auto;white-space:nowrap;} /* tighter gap */
+  .stack{display:inline-flex;align-items:center;justify-content:center;gap:4px;width:auto;white-space:nowrap;} /* keep tight gap */ /* tighter gap */
   .cooldown{color:#b91c1c;font-weight:700}
   .clear{color:var(--ink)}
 
