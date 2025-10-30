@@ -6,46 +6,57 @@
 <title>オプチャ管理</title>
 <style>
   :root{
-    --bg: #f6f7f9;
-    --card: #ffffff;
-    --ink: #111827;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --brand:#2563eb;
-    --danger:#ef4444;
+    /* ベース色 */
+    --bg:#f6f7f9; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+    /* アクセント（薄色） */
+    --blue:#2563eb; --blue-weak:#e9f0ff; --blue-border:#c7d7ff;
+    --red:#ef4444;  --red-weak:#ffeaea;   --red-border:#ffc9c9;
+    /* コントロール共通サイズ（サイズ変更に強くする） */
+    --ctl-h: 32px;            /* 入力/ボタンの高さ */
+    --radius: 10px;           /* 角丸 */
+    --fs: clamp(12px, 1.6vw, 13px); /* 可変フォントサイズ */
+    --fs-small: clamp(11px, 1.4vw, 12px);
   }
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,'Hiragino Kaku Gothic ProN','Meiryo',sans-serif}
+  body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs)/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,'Hiragino Kaku Gothic ProN','Meiryo',sans-serif}
 
   .container{max-width:640px;margin:12px auto;padding:0 12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 
   .header{padding:12px 12px 0}
-  h1{margin:0 0 8px;text-align:center;font-size:15px;font-weight:700}
+  h1{margin:0 0 8px;text-align:center;font-size:clamp(14px,2vw,16px);font-weight:700}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 0 12px}
-  .input{height:30px;border-radius:8px;border:1px solid var(--line);padding:0 10px;font-size:13px;background:#fff}
-  .btn{height:30px;padding:0 12px;border-radius:8px;border:1px solid transparent;font-size:13px;cursor:pointer}
-  .btn.primary{background:var(--brand);color:#fff}
-  .btn.secondary{background:#fff;border-color:var(--line)}
-  .btn.danger{background:#fff;border-color:#fecaca;color:#b91c1c}
+  .input{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 10px;font-size:var(--fs);background:#fff;min-width:200px}
+  .btn{height:var(--ctl-h);padding:0 12px;border-radius:var(--radius);border:1px solid transparent;font-size:var(--fs);cursor:pointer;white-space:nowrap;line-height:1}
+  .btn.primary{background:var(--blue-weak);color:var(--blue);border-color:var(--blue-border)}
+  .btn.secondary{background:#fff;border-color:var(--line);color:var(--ink)}
+  .btn.danger{background:var(--red-weak);color:var(--red);border-color:var(--red-border)}
 
   .tableWrap{padding:8px 12px 12px}
   table{width:100%;border-collapse:collapse;table-layout:fixed}
   th,td{border:1px solid var(--line);padding:6px 8px}
-  th{background:#f9fafb;color:#374151;font-weight:600}
+  th{background:#f9fafb;color:#374151;font-weight:600;white-space:nowrap}
 
   /* columns */
-  .col-date{width:18ch}
-  .col-link{width:5ch;text-align:center}
-  .col-del{width:7ch;text-align:center}
+  .col-date{width:20ch}
+  .col-link{width:6ch;text-align:center}
+  .col-del{width:8ch;text-align:center}
 
-  input[type="date"], input[type="text"]{height:28px;border-radius:8px;border:1px solid var(--line);padding:0 8px;font-size:13px;background:#fff}
+  input[type="date"], input[type="text"]{height:var(--ctl-h);border-radius:var(--radius);border:1px solid var(--line);padding:0 8px;font-size:var(--fs);background:#fff}
   input[type="date"]{width:14ch;text-align:center}
   .name{width:100%}
-  .link{width:3ch;text-align:center}
-  .stack{display:flex;align-items:center;gap:6px}
+  .link{width:3ch; min-width:3ch; text-align:center; font-size:var(--fs)}
+  .stack{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:nowrap}
   .cooldown{color:#b91c1c;font-weight:700}
   .clear{color:var(--ink)}
+
+  /* 狭い画面での保険 */
+  @media (max-width:420px){
+    :root{ --ctl-h: 30px; }
+    .col-date{width:19ch}
+    .toolbar{gap:6px}
+    .input{min-width:160px}
+  }
 </style>
 </head>
 <body>
@@ -96,15 +107,15 @@ function render(){
     if(!matchesFilter(r)) return;
     const tr=document.createElement('tr');
 
-    // date + update
+    // 日付 + 更新（横並び、ノーラップ）
     const tdDate=document.createElement('td');
     const stk=document.createElement('div');stk.className='stack';
     const inputDate=document.createElement('input');inputDate.type='date';inputDate.value=r.date||'';inputDate.className=daysSince(r.date)<15?'cooldown':'clear';
     inputDate.oninput=e=>{r.date=e.target.value;inputDate.className=daysSince(r.date)<15?'cooldown':'clear'};
-    const upd=document.createElement('button');upd.className='btn secondary';upd.textContent='更新';upd.onclick=()=>{r.date=todayStr();inputDate.value=r.date;inputDate.className='cooldown'};
+    const upd=document.createElement('button');upd.className='btn primary';upd.textContent='更新';upd.onclick=()=>{r.date=todayStr();inputDate.value=r.date;inputDate.className='cooldown'};
     stk.append(inputDate,upd);tdDate.appendChild(stk);
 
-    // name
+    // 名前
     const tdName=document.createElement('td');
     const nm=document.createElement('input');nm.type='text';nm.className='name';nm.value=r.name||'';nm.oninput=e=>r.name=e.target.value;tdName.appendChild(nm);
 
@@ -116,7 +127,7 @@ function render(){
     const tdL2=document.createElement('td');
     const l2=document.createElement('input');l2.className='link';l2.inputMode='numeric';l2.maxLength=2;l2.value=r.link2||'';l2.oninput=e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,2);r.link2=e.target.value};tdL2.appendChild(l2);
 
-    // delete
+    // delete（薄い赤）
     const tdDel=document.createElement('td');
     const del=document.createElement('button');del.className='btn danger';del.textContent='削除';del.onclick=()=>confirmDel(i);tdDel.appendChild(del);
 
