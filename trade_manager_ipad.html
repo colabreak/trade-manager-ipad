@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>取引管理ツール（iPad対応）</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 1rem;
+  }
+  h1 {
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  th {
+    background: #e2e6ef;
+  }
+  input, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.4rem;
+  }
+  button {
+    background: #007aff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  button:hover {
+    background: #005bbb;
+  }
+</style>
+</head>
+<body>
+<h1>取引管理ツール（15日自動リセット）</h1>
+<div>
+  <button id="addRow">2行追加</button>
+  <button id="saveData">保存</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>日付</th>
+      <th>名前</th>
+      <th>URL</th>
+      <th>備考</th>
+      <th>削除</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+<script>
+const STORAGE_KEY = 'tradeManagerData';
+const MAX_ROWS = 30; // 1日2行 × 15人 = 最大30行
+
+function loadData() {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const now = new Date();
+  // 15日経過したデータを除外
+  return saved.filter(item => {
+    const diff = (now - new Date(item.date)) / (1000 * 60 * 60 * 24);
+    return diff < 15;
+  });
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function render() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const data = loadData();
+  data.forEach((item, index) => {
+    const row = document.createElement('tr');
+
+    const dateCell = document.createElement('td');
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.value = item.date;
+    dateCell.appendChild(dateInput);
+
+    const nameCell = document.createElement('td');
+    const nameInput = document.createElement('input');
+    nameInput.value = item.name;
+    nameCell.appendChild(nameInput);
+
+    const urlCell = document.createElement('td');
+    const urlInput = document.createElement('input');
+    urlInput.type = 'url';
+    urlInput.value = item.url;
+    urlCell.appendChild(urlInput);
+
+    const noteCell = document.createElement('td');
+    const noteInput = document.createElement('textarea');
+    noteInput.value = item.note;
+    noteCell.appendChild(noteInput);
+
+    const deleteCell = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '削除';
+    delBtn.onclick = () => {
+      data.splice(index, 1);
+      saveData(data);
+      render();
+    };
+    deleteCell.appendChild(delBtn);
+
+    row.append(dateCell, nameCell, urlCell, noteCell, deleteCell);
+    tbody.appendChild(row);
+  });
+}
+
+document.getElementById('addRow').onclick = () => {
+  const data = loadData();
+  if (data.length + 2 > MAX_ROWS) {
+    alert('管理できるのは最大30行（1日2行×15人）までです。');
+    return;
+  }
+  const today = new Date().toISOString().split('T')[0];
+  // 同じ日付で2行追加
+  data.push({ date: today, name: '', url: '', note: '' });
+  data.push({ date: today, name: '', url: '', note: '' });
+  saveData(data);
+  render();
+};
+
+document.getElementById('saveData').onclick = () => {
+  const rows = document.querySelectorAll('#tableBody tr');
+  const data = Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input, textarea');
+    return {
+      date: inputs[0].value,
+      name: inputs[1].value,
+      url: inputs[2].value,
+      note: inputs[3].value
+    };
+  });
+  saveData(data);
+  alert('保存しました。');
+};
+
+render();
+</script>
+</body>
+</html>
